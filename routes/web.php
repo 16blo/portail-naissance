@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Models\Demande;
 
 # Page d'accueil
 Route::get('/', function () {
@@ -30,12 +31,8 @@ Route::get('/salut/{nom}', function ($nom) {
 });
 
 Route::get('/demandes', function () {
-    $demandes = [
-        ['nom' => 'KOUAME Aya',    'statut' => 'En attente'],
-        ['nom' => 'DIALLO Ibrahim', 'statut' => 'Validée'],
-        ['nom' => 'TRAORE Awa',     'statut' => 'Rejetée'],
-        ['nom' => 'KONE Moussa',    'statut' => 'En cours'],
-    ];
+    // Du plus récent au plus ancien
+    $demandes = Demande::orderBy('created_at', 'desc')->get();
     return view('demandes', ['demandes' => $demandes]);
 });
 
@@ -56,6 +53,10 @@ Route::post('/demande', function (Request $request) {
         'telephone.digits' => 'Le téléphone doit contenir exactement 10 chiffres, sans espaces.',
     ]);
 
+    // ✅ CETTE LIGNE EST OBLIGATOIRE pour écrire dans la base
+    Demande::create($valide);
+
     return redirect('/demande/nouvelle')
-           ->with('succes', 'Votre demande a bien été reçue.');
+           ->with('succes', 'Demande enregistrée.');
 });
+
