@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 # Page d'accueil
 Route::get('/', function () {
@@ -38,21 +39,23 @@ Route::get('/demandes', function () {
     return view('demandes', ['demandes' => $demandes]);
 });
 
+# Formulaire
 Route::get('/demande/nouvelle', function () {
-return view('demandes.formulaire');
+    return view('demandes.formulaire');
 });
+
 Route::post('/demande', function (Request $request) {
-$valide = $request->validate([
-'nom' => 'required|string|max:50',
-'prenom' => 'required|string|max:50',
-'lieu' => 'required|string|max:100',
-'date_naissance' => 'required|date|before:today|after:1900-01-01',
-'telephone' => 'required|digits:10',
-'motif' => 'required|in:Études,Mariage,Passeport',
-], [
-'telephone.digits' => 'Le téléphone doit contenir exactement 10 chiffres, sans
-espaces.',
-]);
-return redirect('/demande/nouvelle')
-->with('succes', 'Votre demande a bien été reçue.');
+    $valide = $request->validate([
+        'nom'             => 'required|string|max:50',
+        'prenom'          => 'required|string|max:50',
+        'lieu'            => 'required|string|max:100',
+        'date_naissance'  => 'required|date|before:today|after:1900-01-01',
+        'telephone'       => 'required|digits:10',
+        'motif'           => 'required|in:Études,Mariage,Passeport',
+    ], [
+        'telephone.digits' => 'Le téléphone doit contenir exactement 10 chiffres, sans espaces.',
+    ]);
+
+    return redirect('/demande/nouvelle')
+           ->with('succes', 'Votre demande a bien été reçue.');
 });
