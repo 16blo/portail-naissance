@@ -11,7 +11,6 @@
             <th>Nom</th>
             <th>Statut</th>
         </tr>
-
         @foreach($demandes as $index => $demande)
         <tr>
             <td>{{ $index + 1 }}</td>
