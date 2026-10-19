@@ -3,8 +3,15 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Models\Demande;
+use Illuminate\Support\Facades\DB;
 
 # Page d'accueil
+Route::get('/recherche', function (Request $request) {
+$q = $request->input('q', '');
+$resultats = Demande::where('nom', $q)->get();
+return view('recherche', ['resultats' => $resultats, 'q' => $q]);
+});
+
 Route::get('/', function () {
     return view('accueil');
 });
@@ -30,12 +37,12 @@ Route::get('/salut/{nom}', function ($nom) {
     return view('salut', ['nom' => $nom]);
 });
 
-Route::get('/demandes', function () {
-    // Du plus récent au plus ancien
-    $demandes = Demande::orderBy('created_at', 'desc')->get();
-    return view('demandes', ['demandes' => $demandes]);
+Route::get('/demandes', function (Request $request) {
+$tri = in_array($request->input('tri'), ['nom', 'created_at'], true)
+? $request->input('tri') : 'created_at';
+$demandes = Demande::orderBy($tri)->get();
+return view('demandes', ['demandes' => $demandes]);
 });
-
 # Formulaire
 Route::get('/demande/nouvelle', function () {
     return view('demandes.formulaire');
@@ -54,7 +61,7 @@ Route::post('/demande', function (Request $request) {
     ]);
 
     // ✅ CETTE LIGNE EST OBLIGATOIRE pour écrire dans la base
-    Demande::create($valide);
+    Demande::create($request->all()).
 
     return redirect('/demande/nouvelle')
            ->with('succes', 'Demande enregistrée.');
